@@ -29,6 +29,19 @@ private JwtAuthFilter jwtAuthFilter;
 
 @Bean
 public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	/*
+	 * http .csrf(csrf->csrf.disable())
+	 * .cors(cors->cors.configurationSource(corsConfigurationSource()))
+	 * .authorizeHttpRequests(auth-> auth .requestMatchers(HttpMethod.OPTIONS,
+	 * "/**").permitAll() .requestMatchers("/api/leads/**").permitAll()
+	 * .requestMatchers("api/auth/login").permitAll()
+	 * .requestMatchers("api/auth/**").hasRole("ADMIN")
+	 * .anyRequest().authenticated())
+	 * .sessionManagement(session->session.sessionCreationPolicy(
+	 * SessionCreationPolicy.STATELESS)) .addFilterBefore(jwtAuthFilter,
+	 * UsernamePasswordAuthenticationFilter.class); return http.build();
+	 */  //use this for docker
+	
 	http
 	.csrf(csrf->csrf.disable())
 	.cors(cors->cors.configurationSource(corsConfigurationSource()))
@@ -37,16 +50,19 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 	        .requestMatchers("/api/leads/**").permitAll()
 	        .requestMatchers("/auth/login").permitAll()
 	        .requestMatchers("/auth/**").hasRole("ADMIN")
+	        .requestMatchers("/api/quotations/**").hasRole("ADMIN")
+	        .requestMatchers("/installations/**").hasRole("ADMIN")
 	         .anyRequest().authenticated())
 	    .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 	    .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 	return http.build();
+
 }
 
 @Bean
 public CorsConfigurationSource corsConfigurationSource() {
 	CorsConfiguration config=new CorsConfiguration();
-	config.setAllowedOrigins(List.of("http://localhost:4200"));
+	config.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost","http://localhost:80"));
 	config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
 	config.setAllowedHeaders(List.of("*"));
 	config.setAllowCredentials(true);

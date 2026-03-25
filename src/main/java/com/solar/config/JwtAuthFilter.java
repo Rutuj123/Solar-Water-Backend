@@ -11,6 +11,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.solar.service.CustomUserDetailsService;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,6 +31,7 @@ public class JwtAuthFilter extends OncePerRequestFilter{
 			throws ServletException, IOException {
 		String authHeader=request.getHeader("Authorization");
 		if(authHeader !=null && authHeader.startsWith("Bearer ")) {
+			try {
 			String token=authHeader.substring(7);
 			String username=jwtUtil.extractUsername(token);
 			if(username!=null && SecurityContextHolder.getContext().getAuthentication() ==null) {
@@ -41,6 +43,11 @@ public class JwtAuthFilter extends OncePerRequestFilter{
 					SecurityContextHolder.getContext().setAuthentication(auth);
 				}
 			}
+			}catch (ExpiredJwtException ex) {
+			    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			    response.getWriter().write("Token Expired");
+			    return;
+			}
 		}
 		filterChain.doFilter(request, response);
 	}
@@ -50,8 +57,12 @@ public class JwtAuthFilter extends OncePerRequestFilter{
        // return request.getServletPath().equals("/auth/login");
 		String path = request.getServletPath();
 
+		/*
+		 * return path.equals("api/auth/login") || path.startsWith("api/api/leads");
+		 */   /// use this when you use dockerize application
 	    return path.equals("/auth/login")
-	        || path.startsWith("/api/leads");
+		        || path.startsWith("/api/leads");
+
     }
 
 

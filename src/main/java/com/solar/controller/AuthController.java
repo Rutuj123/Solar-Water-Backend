@@ -38,7 +38,9 @@ private LeadService leadService;
 
 @Autowired
 private ProductService productService;
-	
+
+@Autowired
+private PasswordEncoder passwordEncoder;	
 	
 	@PostMapping("/login")
 	public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
@@ -46,8 +48,8 @@ private ProductService productService;
 		try {
 		System.out.println("in login......................");
 		
-		//String encodedPassword = passwordEncoder.encode("admin123");
-	//System.out.println("encodedPassword..............."+encodedPassword);
+		String encodedPassword = passwordEncoder.encode("admin123");
+	System.out.println("encodedPassword..............."+encodedPassword);
 		
 		authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(),
@@ -92,7 +94,7 @@ private ProductService productService;
 	} 
 	@PutMapping("/products")
 	public ResponseEntity<Product> editproduct(@RequestBody ProductRequest request) {
-		Product product = new Product();
+		Product product = productService.findById(request.getId()).orElseThrow(()->new RuntimeException("product not found")); 
         product.setName(request.getName());
         product.setPrice(request.getPrice());
        // product.setDescription(request.getDescription());

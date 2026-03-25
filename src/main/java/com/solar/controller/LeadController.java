@@ -26,8 +26,9 @@ public class LeadController {
     }
 
     @GetMapping
-    public List<Lead> getLeads() {
-        return leadService.getAllLeads();
+    public ResponseEntity<List<Lead>> getLeads() {
+    	List<Lead> list=leadService.getAllLeads();
+         return ResponseEntity.ok(list);
     }
   
 }
